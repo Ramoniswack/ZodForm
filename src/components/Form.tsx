@@ -1,25 +1,52 @@
+import {zodResolver} from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
 
+// type FormData = {
+//   name: string;
+//   address: string;
+//   email: string;
+//   gender: string;
+//   country: string;
+//   file: FileList;
 
-type FormData = {
-  name: string;
-  address: string;
-  email: string;
-  gender: string;
-  country: string;
-  file: FileList;
+// };
+const schema = z.object(
+    {   
+        name: z.string().min(3, "Name is too short"),
+        address: z.string().min(3, "Address is too short"),
+        email: z.string().email("Invalid email address"),
+        age: z.number().min(18, "Must be 18 or older"),
+        gender: z.enum(["Male", "Female"]).refine(val => val, {
+            message: "Gender is required",
+        }),
+        country: z.string().min(1, "Country is required"),
+        file: z
+        .any()
+        .refine(
+            (files) => files.length > 0,
+            {
+                message: "File is required",
+            }
+        )
 
-};
+    }
+);
 
-const FillForm = () => {
+type FormData = z.infer<typeof schema>;
+
+const Form = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
 
   const onSubmit = (data: FormData) => {
     console.log(data);
+    alert(`Hi ${data.name}, your form has been submitted`);
   };
 
   return (
@@ -36,7 +63,7 @@ const FillForm = () => {
           </label>
           <input
             id="name"
-            {...register("name", { required: "Name Required" })}
+            {...register("name")}
             className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
             placeholder="Enter your name"
           />
@@ -46,12 +73,29 @@ const FillForm = () => {
         </div>
 
         <div className="flex flex-col">
+  <label htmlFor="age" className="mb-1 text-sm font-medium text-gray-700">
+    Age
+  </label>
+  <input
+    id="age"
+    type="number"
+    {...register("age", { valueAsNumber: true })}
+    className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+    placeholder="Enter your age"
+  />
+  {errors.age && (
+    <p className="text-red-500 text-sm mt-1">{errors.age.message}</p>
+  )}
+</div>
+
+
+        <div className="flex flex-col">
           <label htmlFor="address" className="mb-1 text-sm font-medium text-gray-700">
             Address
           </label>
           <input
             id="address"
-            {...register("address", { required: "Address Required" })}
+            {...register("address")}
             className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
             placeholder="Enter your address"
           />
@@ -66,10 +110,7 @@ const FillForm = () => {
             </label>
           <input
             id="email" 
-            {...register("email", {required:"Email Required",
-              pattern:{
-                value: /^[a-zA-Z0-9.+%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                message: "Invalid email address"},})
+            {...register("email")
               
             }
             className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -91,7 +132,7 @@ const FillForm = () => {
               type="radio"
               value="Male"
               defaultChecked
-              {...register("gender", { required: "Required" })}
+              {...register("gender")}
          />
          <span>Male</span>
          </label>
@@ -101,7 +142,7 @@ const FillForm = () => {
               type="radio"
               value="Female"
               
-              {...register("gender", { required: "Required" })}
+              {...register("gender")}
          />
          <span>Female</span>
          </label>
@@ -117,16 +158,22 @@ const FillForm = () => {
           </label>
           <select className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
             id="country"
+            defaultValue ="Nepal"
+
             {
-              ...register("country", { required: "Required" })
+              ...register("country")
             }
+
             >
-              <option className="text-gray-700" value="" selected>Nepal</option>
-               <option className="text-gray-700" value="">Us</option>
-              <option className="text-gray-700" value="">India</option>
+              <option className="text-gray-700" value="Nepal">Nepal</option>
+               <option className="text-gray-700" value="U.S.">U.S.</option>
+              <option className="text-gray-700" value="India">India</option>
 
             
             </select>
+             {errors.country && (
+              <p className="text-red-500 text-sm mt-1 ">{errors.country.message}</p>
+            )}
           </div>
 
           <div className="flex flex-col">
@@ -135,14 +182,13 @@ const FillForm = () => {
             </label>
 
             <input
-            className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
             type="file"
             id="file"
-            {...register("file", {required: "Upload your file"})}
-            className="hidden"
+            {...register("file")}
+  className="cursor-pointer px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-900 inline-block"
             />
-            <label htmlFor="file"
-    className="cursor-pointer px-4 py-2 bg-gray-500 text-white rounded hover:bg-blue-900">Choose file</label>
+            {/* <label htmlFor="file"
+    className="cursor-pointer px-4 py-2 bg-gray-500 text-white rounded hover:bg-blue-900">Choose file</label> */}
 
             {errors.file && (
               <p className="text-red-500 text-sm mt-1 ">{errors.file.message}</p>
@@ -154,7 +200,7 @@ const FillForm = () => {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200 cursor-pointer"
         >
           Submit
         </button>
@@ -163,4 +209,4 @@ const FillForm = () => {
   );
 };
 
-export default FillForm;
+export default Form;

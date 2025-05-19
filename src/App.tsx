@@ -1,8 +1,9 @@
-import FillForm from "./components/FillForm";
+// import FillForm from "./components/FillForm";
+import Form from "./components/Form";
 const App = () => {
   return (
     <div>
-      <FillForm />
+      <Form />
     </div>
   );
 };
