@@ -1,7 +1,6 @@
 import {zodResolver} from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
 
 // type FormData = {
 //   name: string;
@@ -25,7 +24,7 @@ const schema = z.object(
         file: z
         .any()
         .refine(
-            (files) => files.length > 0,
+            (files) => files && files.length > 0,
             {
                 message: "File is required",
             }
@@ -45,17 +44,46 @@ const Form = () => {
     resolver: zodResolver(schema),
   });
 
-const onSubmit = (data: FormData) => {
+
+ const onSubmit = (data : FormData) => {
+  
+  try{
+
+               // getting old data from storage if any!!!!!
+
+    const previousData= localStorage.getItem("formData");
+
+               // convert the old data from text to array (or use empty array if nothing saved before)
+    const oldEntries = previousData? JSON.parse(previousData): [];
+
+               // Get the file name ( if user uploaded something)
+
+    const fileName = data.file && data.file.length > 0 ? data.file[0].name : " ";
+
+               // make a new entry without the actual file (just the name)
+
+    const newEntry = {
+      ...data,
+      file: fileName,
+    }
+
+                // save all old + new data back to localStorage
+
+    const allEntries = [...oldEntries, newEntry];
+    localStorage.setItem("formData", JSON.stringify(allEntries));
 
 
-localStorage.setItem("formData", JSON.stringify([data]));
-
-
-    alert(`Hi ${data.name}, your form has been submitted!`);
- 
+    // show success message
+    alert(`Hi ${data.name}, your form has been submitted`);
+    console.log("Form submitted successfully:", data);
   }
-};
+  catch (error) {
+    console.error("Error saving data:", error);
+        alert("Something went wrong. Please try again.");
 
+  }
+
+ };
 
 
 

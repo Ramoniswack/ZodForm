@@ -1,11 +1,11 @@
 // import FillForm from "./components/FillForm";
 import Form from "./components/Form";
-import FormDataTable from "./components/FormDataTable";
+import Table from "./components/Table";
 const App = () => {
   return (
     <div>
       <Form />
-      <FormDataTable />
+      <Table />
     </div>
   );
 };
