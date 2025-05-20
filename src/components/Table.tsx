@@ -31,7 +31,7 @@ const Table = () => {
 
     return (
 
-    <div className="items-center justify-center bg-gradient-to-br from-gray-100 to-blue-100">
+    <div className="min-h-96 items-center justify-center bg-gradient-to-br from-gray-100 to-blue-100">
       <h2 className="text-xl font-bold text-center mb-4">Saved Entries</h2>
 
       {entries.length === 0 ? (
