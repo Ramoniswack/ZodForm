@@ -1,6 +1,7 @@
 import {zodResolver} from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
+import { useEffect } from "react";
 
 // type FormData = {
 //   name: string;
@@ -44,10 +45,20 @@ const Form = () => {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log(data);
-    alert(`Hi ${data.name}, your form has been submitted`);
-  };
+const onSubmit = (data: FormData) => {
+
+
+localStorage.setItem("formData", JSON.stringify([data]));
+
+
+    alert(`Hi ${data.name}, your form has been submitted!`);
+ 
+  }
+};
+
+
+
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-blue-100">
